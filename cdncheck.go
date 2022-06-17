@@ -29,6 +29,10 @@ var defaultScrapersWithOptions = map[string]scraperWithOptionsFunc{
 	"akamai":   scrapeAkamai,
 	"sucuri":   scrapeSucuri,
 	"leaseweb": scrapeLeaseweb,
+	"edgecast": scrapeEdgeCast,
+	"azion": scrapeAzion,
+	"stackpath": scrapeStackPath,
+	"limelight": scrapeLimeLight,
 }
 
 // New creates a new firewall IP checking client.

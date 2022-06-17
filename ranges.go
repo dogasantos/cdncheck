@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"fmt"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -197,3 +198,132 @@ func makeReqWithAuth(method, URL, headerName, bearerValue string) (*http.Request
 	req.Header.Add(headerName, "Bearer "+bearerValue)
 	return req, nil
 }
+
+// scrapeAzion scrapes Azion firewall's CIDR ranges from ipinfo
+func scrapeAzion(httpClient *http.Client, options *Options) ([]string, error) {
+	req, err := makeReqWithAuth(http.MethodGet, "https://ipinfo.io/AS52580", "Authorization", "Bearer "+options.IPInfoToken)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	body := string(data)
+
+	cidrs := cidrRegex.FindAllString(body, -1)
+	return cidrs, nil
+}
+
+
+
+// scrapeStackPath scrapes stackpath firewall's CIDR ranges from ipinfo
+func scrapeStackPath(httpClient *http.Client, options *Options) ([]string, error) {
+	cidrs := []string{}
+
+	ASNlist :=  [5]string{"AS33438", "AS20446", "AS199156", "AS18607", "AS12989"}
+
+	for _, asn := range ASNlist {
+		ipinfourl := fmt.Sprintf("https://ipinfo.io/%s", asn)
+
+		req, err := makeReqWithAuth(http.MethodGet, ipinfourl, "Authorization", "Bearer "+options.IPInfoToken)
+
+		if err != nil {
+			return nil, err
+		}
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		body := string(data)
+
+		for _, cidr := range cidrRegex.FindAllString(body, -1) {
+			cidrs = append(cidrs,cidr)
+		}
+
+	
+	}
+
+	return cidrs, nil
+}
+
+
+// scrapeEdgeCast scrapes Edgecast firewall's CIDR ranges from ipinfo
+func scrapeEdgeCast(httpClient *http.Client, options *Options) ([]string, error) {
+	cidrs := []string{}
+
+	ASNlist :=  [3]string{"AS15133", "AS14210", "AS14153"}
+
+	for _, asn := range ASNlist {
+		ipinfourl := fmt.Sprintf("https://ipinfo.io/%s", asn)
+
+		req, err := makeReqWithAuth(http.MethodGet, ipinfourl, "Authorization", "Bearer "+options.IPInfoToken)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		body := string(data)
+
+		for _, cidr := range cidrRegex.FindAllString(body, -1) {
+			cidrs = append(cidrs,cidr)
+		}
+	
+	}
+	
+	return cidrs, nil
+}
+
+// scrapeLimeLight scrapes LimeLight firewall's CIDR ranges from ipinfo
+func scrapeLimeLight(httpClient *http.Client, options *Options) ([]string, error) {
+	cidrs := []string{}
+
+	ASNlist :=  [9]string{"AS60261","AS55429","AS45396", "AS38622", "AS37277", "AS26506", "AS25804", "AS23059", "AS22822" }
+	
+	for _, asn := range ASNlist {
+		ipinfourl := fmt.Sprintf("https://ipinfo.io/%s", asn)
+
+		req, err := makeReqWithAuth(http.MethodGet, ipinfourl, "Authorization", "Bearer "+options.IPInfoToken)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		body := string(data)
+
+		for _, cidr := range cidrRegex.FindAllString(body, -1) {
+			cidrs = append(cidrs,cidr)
+		}
+	}
+	
+	return cidrs, nil
+}
+
