@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/projectdiscovery/cdncheck"
+	"github.com/dogasantos/cdncheck"
 )
 
 var (
