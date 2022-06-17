@@ -1,4 +1,4 @@
-module github.com/projectdiscovery/cdncheck
+module github.com/dogasantos/cdncheck
 
 go 1.17
 
